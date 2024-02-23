@@ -63,10 +63,7 @@ class WindowClass(QMainWindow, from_class):
 
         self.record = Camera(self)
         self.record.daemon = True
-
-        self.color_change = Camera(self)
-        self.color_change.daemon = True
-
+        
         self.btnLoad.clicked.connect(self.loadFile)
         self.btnCamera.clicked.connect(self.clickCamera)
         self.camera.update.connect(self.updateCamera)
