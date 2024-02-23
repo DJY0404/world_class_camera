@@ -63,7 +63,7 @@ class WindowClass(QMainWindow, from_class):
 
         self.record = Camera(self)
         self.record.daemon = True
-        
+
         self.btnLoad.clicked.connect(self.loadFile)
         self.btnCamera.clicked.connect(self.clickCamera)
         self.camera.update.connect(self.updateCamera)
@@ -350,7 +350,9 @@ class WindowClass(QMainWindow, from_class):
 
             else:
                 self.open_video(file)
-        
+    
+    def get_image(self,file):
+        self.image = cv2.imread(file)
 
     def display_image(self,file):
         self.image = cv2.imread(file)
