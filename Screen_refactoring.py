@@ -345,7 +345,8 @@ class WindowClass(QMainWindow, from_class):
 
         if file:
             if file.lower().endswith((".png",".jpg",".jpeg")):
-                self.display_image(file)
+                #self.display_image(file)
+                self.test(file)
                 self.btnSave.show()
 
             else:
@@ -372,9 +373,17 @@ class WindowClass(QMainWindow, from_class):
             w,h = image.shape
             c = 1
             return w,h,c 
+        
+    def test(self,file):
+        src = self.get_image(file)
+        image = self.get_convert(src,cv2.COLOR_BGR2RGB)
+        w,h,c = self.get_WHC(image)
+        qimage = self.set_Qimage_format(image,w,h,c,QImage.Format_RGB888)
+        self.set_pixmap(qimage)
+        
   
 
-    def set_pixmap(self):
+    def set_pixmap(self,qimage):
 
         self.pixmap = self.pixmap.fromImage(qimage)
         self.pixmap = self.pixmap.scaled(self.screen.width(),self.screen.height())
