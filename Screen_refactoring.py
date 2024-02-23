@@ -352,7 +352,35 @@ class WindowClass(QMainWindow, from_class):
                 self.open_video(file)
     
     def get_image(self,file):
-        self.image = cv2.imread(file)
+        image = cv2.imread(file)
+        return image
+    
+    def get_convert(self,src,cv2_format):
+        image = cv2.cvt(src,cv2_format)
+        return image
+    
+    def set_Qimage_format(self,data,w,h,c,Qimage_format):
+        qimage = QImage(data, w,h,w*c, Qimage_format)
+        return qimage
+
+    def get_WHC(self,image):
+        image.shape
+        if len(image.shape) == 3:
+            w,h,c = image.shape
+            return w,h,c
+        else:
+            w,h = image.shape
+            c = 1
+            return w,h,c 
+  
+
+    def set_pixmap(self):
+
+        self.pixmap = self.pixmap.fromImage(qimage)
+        self.pixmap = self.pixmap.scaled(self.screen.width(),self.screen.height())
+
+        self.screen.setPixmap(self.pixmap)
+
 
     def display_image(self,file):
         self.image = cv2.imread(file)
