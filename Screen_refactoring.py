@@ -78,9 +78,27 @@ class WindowClass(QMainWindow, from_class):
         self.btnHSV.clicked.connect(self.changeHSV)
 
         self.blur.clicked.connect(self.changeBlur)
+        self.blurSlider.setRange(0,20)
+        self.blurSlider.setSingleStep(1)
+        self.blurSlider.valueChanged.connect(self.changeSlider)
         
         self.binary.clicked.connect(self.changeBinary)
         self.threshold.returnPressed.connect(self.addValue)
+
+    def changeSlider(self):
+        """       if self.isBlurOn:
+            av = self.blurSlider.value()
+            #self.image = cv2.blur(self.image, (av, av))
+            self.bsValue.setText(str(av))
+
+            kernel_size = self.blurSlider.value()
+            if kernel_size % 2 == 0:
+                kernel_size += 1
+            blurred_image = cv2.blur(self.image, (kernel_size, kernel_size))
+            self.pixmap = self.pixmap.fromImage(QImage(blurred_image.data, blurred_image.shape[1], blurred_image.shape[0], QImage.Format_RGB888))
+            self.screen.setPixmap(self.pixmap.scaled(self.screen.width(),self.screen.height()))"""
+        pass
+
     
     def addValue(self):
         self.threshold_value = int(self.threshold.text())
@@ -129,20 +147,26 @@ class WindowClass(QMainWindow, from_class):
 
 
     def changeBlur(self):
+        
         if self.isBlurOn == False:
             self.isBlurOn = True
-            self.image_copy = self.image.copy()
-            self.image = cv2.GaussianBlur(self.image, (75, 75), 0)
+            image_copy = self.image.copy()
+            image = self.image
+            kernel_size = self.blurSlider.value()
+            if kernel_size % 2 == 0:
+                kernel_size += 1
+            image = cv2.blur(image, (75, 75))            
         else:
             self.isBlurOn = False
-            self.image = self.image_copy
+            image = image_copy
 
-        h,w,c = self.image.shape
-        qimage = QImage(self.image.data, w,h,w*c, QImage.Format_RGB888)
+        h,w,c = image.shape
+        qimage = QImage(image.data, w,h,w*c, QImage.Format_RGB888)
 
         self.pixmap = self.pixmap.fromImage(qimage)
         self.pixmap = self.pixmap.scaled(self.screen.width(),self.screen.height())
         self.screen.setPixmap(self.pixmap)
+
     
 
     def changeR(self):
@@ -313,7 +337,10 @@ class WindowClass(QMainWindow, from_class):
                 self.onlyBlue()
 
             if self.isBlurOn == True:
-                self.image = cv2.GaussianBlur(self.image, (75, 75), 0)
+                kernel_size = self.blurSlider.value()
+                if kernel_size % 2 == 0:
+                    kernel_size += 1
+                self.image = cv2.blur(self.image, (kernel_size, kernel_size))
 
             if self.isHSVOn == True:
                 self.image = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
@@ -354,31 +381,37 @@ class WindowClass(QMainWindow, from_class):
     
     def get_image(self,file):
         image = cv2.imread(file)
+        self.image = image
         return image
+    
+    def set_image(self):
+        return self.image
+
     
     def get_convert(self,src,cv2_format):
-        image = cv2.cvt(src,cv2_format)
+        image = cv2.cvtColor(src,cv2_format)
         return image
     
-    def set_Qimage_format(self,data,w,h,c,Qimage_format):
-        qimage = QImage(data, w,h,w*c, Qimage_format)
+    def set_Qimage_format(self,image,w,h,c,Qimage_format):
+        qimage = QImage(image.data, w,h,w*c, Qimage_format)
         return qimage
 
     def get_WHC(self,image):
-        image.shape
+        print(len(image.shape))
         if len(image.shape) == 3:
-            w,h,c = image.shape
-            return w,h,c
+            h,w,c = image.shape
         else:
             w,h = image.shape
             c = 1
-            return w,h,c 
+            
+        return h,w,c
         
     def test(self,file):
         src = self.get_image(file)
         image = self.get_convert(src,cv2.COLOR_BGR2RGB)
-        w,h,c = self.get_WHC(image)
-        qimage = self.set_Qimage_format(image,w,h,c,QImage.Format_RGB888)
+        h,w,c = self.get_WHC(image)
+        #h,w,c = image.shape
+        qimage = self.set_Qimage_format(image,w,h,c,QImage.Format_Grayscale8)
         self.set_pixmap(qimage)
         
   
@@ -392,12 +425,16 @@ class WindowClass(QMainWindow, from_class):
 
 
     def display_image(self,file):
-        self.image = cv2.imread(file)
-        self.image = cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB)
-        
-        h,w,c = self.image.shape
-        qimage = QImage(self.image.data, w,h,w*c, QImage.Format_RGB888)
-
+        #self.image = cv2.imread(file)
+        #self.image = cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB)
+        image = cv2.imread(file)
+        image = cv2.cvtColor(image,cv2.COLOR_BGR2RGB)
+        #h,w,c = self.image.shape
+        h,w,c = image.shape
+        #qimage = QImage(self.image.data, w,h,w*c, QImage.Format_RGB888)
+        qimage = QImage(image.data, w,h,w*c, QImage.Format_RGB888)
+        #self.pixmap = self.pixmap.fromImage(qimage)
+        #self.pixmap = self.pixmap.scaled(self.screen.width(),self.screen.height())
         self.pixmap = self.pixmap.fromImage(qimage)
         self.pixmap = self.pixmap.scaled(self.screen.width(),self.screen.height())
 
